@@ -62,6 +62,34 @@ const signinWithEmailPassword = async (prev: any, formData: FormData) => {
   } else redirect("/");
 };
 
+const sendResetPasswordForEmail = async (prev: any, formData: FormData) => {
+  const supabase = await createClientForServer();
+
+  const { data, error } = await supabase.auth.resetPasswordForEmail(
+    formData.get("email") as string
+  );
+
+  if (error) {
+    console.log(error);
+    revalidatePath("/auth/reset");
+    return { message: error.message };
+  } else return { message: "Please check your email!" };
+};
+
+const updatePassword = async (prev: any, formData: FormData) => {
+  const supabase = await createClientForServer();
+
+  const { data, error } = await supabase.auth.updateUser({
+    password: formData.get("password") as string,
+  });
+
+  if (error) {
+    console.log(error);
+    revalidatePath("/auth/reset");
+    return { message: error.message };
+  } else return { message: "Password updated!" };
+};
+
 const signOut = async () => {
   const supabase = await createClientForServer();
   await supabase.auth.signOut();
@@ -72,4 +100,6 @@ export {
   signOut,
   signupWithEmailPassword,
   signinWithEmailPassword,
+  sendResetPasswordForEmail,
+  updatePassword,
 };
